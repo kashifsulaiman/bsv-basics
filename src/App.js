@@ -9,12 +9,17 @@ function App() {
   const [encKey, setEncKey] = useState()
   const [decKey, setDecKey] = useState()
   const [publicKey, setPublicKey] = useState()
+  const [hdPublicKey, setHdPublicKey] = useState()
+  const [hdRegPublicKey, setHdRegPublicKey] = useState()
+  const [hdPrivateKey, setHdPrivateKey] = useState()
+  const [hdRegPrivateKey, setHdRegPrivateKey] = useState()
   const [address, setAddress] = useState()
   const [exchangeRate, setExchangeRate] = useState()
   const [walletBalance, setWalletBalance] = useState()
 
   useEffect(() => {
     generateKeys()
+    generateHdKeys()
     getAndSetExchangeRates()
   }, [])
 
@@ -23,9 +28,9 @@ function App() {
   }, [address])
 
   const generateKeys = () => {
-    const privateKey = bsv.PrivKey.fromRandom()
-    const publicKey = bsv.PubKey.fromPrivKey(privateKey)
-    const address = bsv.Address.fromPubKey(publicKey)
+    const privateKey = bsv.PrivateKey.fromRandom()
+    const publicKey = bsv.PublicKey.fromPrivateKey(privateKey)
+    const address = bsv.Address.fromPublicKey(publicKey)
 
     const password = 'test-123'
     const ciphertext = CryptoJS.AES.encrypt(privateKey.toString(), password).toString()
@@ -37,6 +42,16 @@ function App() {
     setDecKey(originalText)
     setPublicKey(publicKey.toString())
     setAddress(address.toString())
+  }
+
+  const generateHdKeys = () => {
+    const hdPrivateKey = bsv.HDPrivateKey.fromRandom()
+    const hdPublicKey = bsv.HDPublicKey(hdPrivateKey)
+
+    setHdPrivateKey(hdPrivateKey.toString())
+    setHdRegPrivateKey(hdPrivateKey.privateKey.toString())
+    setHdPublicKey(hdPublicKey.toString())
+    setHdRegPublicKey(hdPublicKey.publicKey.toString())
   }
 
   const getAndSetExchangeRates = async () => {
@@ -71,11 +86,20 @@ function App() {
 
   return (
     <div>
+      <h1>General Keys</h1>
       <h3>Private Key: {privateKey}</h3>
       <h3>Encrypted Key: {encKey}</h3>
       <h3>Decrypted Key: {decKey}</h3>
       <h3>Public Key: {publicKey}</h3>
       <h3>Address: {address}</h3>
+      
+      <h1>HD Keys</h1>
+      <h3>HD Private Key: {hdPrivateKey}</h3>
+      <h3>HD Regular Private Key: {hdRegPrivateKey}</h3>
+      <h3>HD Public Key: {hdPublicKey}</h3>
+      <h3>HD Regular Public Key: {hdRegPublicKey}</h3>
+      
+      <h1>Other stuff</h1>
       <QRCodeSVG value={`bitcoinsv: ${address}`} />
       <h3>Exchange Rate: {renderExchangeRate()}</h3>
       <h3>Wallet Balance: {renderWalletBalance()}</h3>
