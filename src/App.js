@@ -13,6 +13,10 @@ function App() {
   const [hdRegPublicKey, setHdRegPublicKey] = useState()
   const [hdPrivateKey, setHdPrivateKey] = useState()
   const [hdRegPrivateKey, setHdRegPrivateKey] = useState()
+  const [hdPrivateChildKey, setHdPrivateChildKey] = useState()
+  const [hdRegPrivateChildKey, setHdRegPrivateChildKey] = useState()
+  const [hdRegPublicChildKey, setHdRegPublicChildKey] = useState()
+  const [hardenedKey, setHardenedKey] = useState()
   const [address, setAddress] = useState()
   const [exchangeRate, setExchangeRate] = useState()
   const [walletBalance, setWalletBalance] = useState()
@@ -45,13 +49,24 @@ function App() {
   }
 
   const generateHdKeys = () => {
-    const hdPrivateKey = bsv.HDPrivateKey.fromRandom()
+    // const hdPrivateKey = bsv.HDPrivateKey.fromRandom()
+    const hdPrivateKey = bsv.HDPrivateKey.fromString('xprv9s21ZrQH143K2LcEfSnFRH1JvdKAcuZj2C8kAzCDnvqC4kgo417hYmAYQKdYDSzQSnQMLWXjDG42TgWwdYqwhAWTWpEBG1ighLLNnVHNKxx')
     const hdPublicKey = bsv.HDPublicKey(hdPrivateKey)
 
     setHdPrivateKey(hdPrivateKey.toString())
     setHdRegPrivateKey(hdPrivateKey.privateKey.toString())
     setHdPublicKey(hdPublicKey.toString())
     setHdRegPublicKey(hdPublicKey.publicKey.toString())
+
+    //Derived Child Keys
+    const hdPrivateChildKey = hdPrivateKey.deriveChild("m/1/1/1");
+    const hardenedKey = hdPrivateKey.deriveChild("m/1'/1'/1'");
+    //"m/1/1/1". This means from the master HD key we have derived the 1st HD key, then the 1st HD key of the previous HD key, and then the 1st HD key of that key
+
+    setHdPrivateChildKey(hdPrivateChildKey.toString())
+    setHdRegPrivateChildKey(hdPrivateChildKey.privateKey.toString())
+    setHdRegPublicChildKey(hdPrivateChildKey.publicKey.toString())
+    setHardenedKey(hardenedKey.toString())
   }
 
   const getAndSetExchangeRates = async () => {
@@ -98,6 +113,10 @@ function App() {
       <h3>HD Regular Private Key: {hdRegPrivateKey}</h3>
       <h3>HD Public Key: {hdPublicKey}</h3>
       <h3>HD Regular Public Key: {hdRegPublicKey}</h3>
+      <h3>HR Child Private Key: {hdPrivateChildKey}</h3>
+      <h3>HR Child Regular Private Key: {hdRegPrivateChildKey}</h3>
+      <h3>HR Child Regular Public Key: {hdRegPublicChildKey}</h3>
+      <h3>Hardened Key: {hardenedKey}</h3>
       
       <h1>Other stuff</h1>
       <QRCodeSVG value={`bitcoinsv: ${address}`} />
