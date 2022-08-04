@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import * as bsv from 'bsv'
+import Mnemonic from 'bsv/mnemonic'
 import CryptoJS from 'crypto-js'
 import { QRCodeSVG } from 'qrcode.react'
 import { getExchangeRates, getWalletBalance } from './config/api'
@@ -20,10 +21,12 @@ function App() {
   const [address, setAddress] = useState()
   const [exchangeRate, setExchangeRate] = useState()
   const [walletBalance, setWalletBalance] = useState()
+  const [mnemonic, setMnemonic] = useState()
 
   useEffect(() => {
     generateKeys()
     generateHdKeys()
+    generateMnemonic()
     getAndSetExchangeRates()
   }, [])
 
@@ -67,6 +70,10 @@ function App() {
     setHdRegPrivateChildKey(hdPrivateChildKey.privateKey.toString())
     setHdRegPublicChildKey(hdPrivateChildKey.publicKey.toString())
     setHardenedKey(hardenedKey.toString())
+  }
+
+  const generateMnemonic = () => {
+    setMnemonic(Mnemonic.fromRandom().phrase)
   }
 
   const getAndSetExchangeRates = async () => {
@@ -119,6 +126,7 @@ function App() {
       <h3>Hardened Key: {hardenedKey}</h3>
       
       <h1>Other stuff</h1>
+      <h3>Mnemonic: {mnemonic}</h3>
       <QRCodeSVG value={`bitcoinsv: ${address}`} />
       <h3>Exchange Rate: {renderExchangeRate()}</h3>
       <h3>Wallet Balance: {renderWalletBalance()}</h3>
