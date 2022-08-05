@@ -3,7 +3,7 @@ import * as bsv from 'bsv'
 import Mnemonic from 'bsv/mnemonic'
 import CryptoJS from 'crypto-js'
 import { QRCodeSVG } from 'qrcode.react'
-import { getExchangeRates, getWalletBalance } from './config/api'
+import { getExchangeRates, getWalletBalance, getTaalFeeQuote } from './config/api'
 
 function App() {
   const [privateKey, setPrivateKey] = useState()
@@ -23,12 +23,14 @@ function App() {
   const [walletBalance, setWalletBalance] = useState()
   const [mnemonic, setMnemonic] = useState()
   const [rawTransaction, setRawTransaction] = useState()
+  const [feeQuote, setFeeQuote] = useState()
 
   useEffect(() => {
     generateKeys()
     generateHdKeys()
     generateMnemonic()
     getAndSetExchangeRates()
+    getAndSetFeeQuote()
   }, [])
 
   useEffect(() => {
@@ -137,6 +139,11 @@ function App() {
 
     setRawTransaction(transaction.toString())
   }
+  
+  const getAndSetFeeQuote = async () => {
+    const quote = await getTaalFeeQuote()
+    setFeeQuote(quote.data.payload)
+  }
 
   return (
     <div>
@@ -165,6 +172,7 @@ function App() {
 
       <button onClick={doTransaction}>Do Transaction</button>
       <h3>Raw Transaction: {rawTransaction}</h3>
+      <h3>Fee Quote: {feeQuote}</h3>
     </div>
   );
 }
