@@ -22,6 +22,7 @@ function App() {
   const [exchangeRate, setExchangeRate] = useState()
   const [walletBalance, setWalletBalance] = useState()
   const [mnemonic, setMnemonic] = useState()
+  const [rawTransaction, setRawTransaction] = useState()
 
   useEffect(() => {
     generateKeys()
@@ -106,6 +107,37 @@ function App() {
     return `confirmed: ${confirmed}, unconfirmed: ${unconfirmed}`
   }
 
+  const doTransaction = () => {
+    // const utxo = new bsv.Transaction.UnspentOutput({
+    //   "address": "1BoUFgA8ZnSFxARg9BgrXgmtZLj2ssrYuw",
+    //   "txid": "<txid>",
+    //   "vout": <vout>,
+    //   "satoshis": <amount>,
+    //   "scriptPubKey": "<script>",
+    // })
+    const utxo = new bsv.Transaction.UnspentOutput({
+      "address": "1BoUFgA8ZnSFxARg9BgrXgmtZLj2ssrYuw",
+      "txid": "975951898cca4c71612f80b332ce05f0408247be125db445557924b93319cb3a",
+      "vout": 2,
+      "amount": 0.00005263,
+      "satoshis": 5263,
+      "value": 5263,
+      "height": 687940,
+      "confirmations": 232,
+      "scriptPubKey": "76a91434f23a48e5b7c103ce7abfeb707406f0a255646288ac",
+      "script": "76a91434f23a48e5b7c103ce7abfeb707406f0a255646288ac",
+      "outputIndex": 0
+    });
+
+    const transaction = new bsv.Transaction()
+      .from(utxo)
+      .to('1BoUFgA8ZnSFxARg9BgrXgmtZLj2ssrYuw', 1800)
+      .change('1BoUFgA8ZnSFxARg9BgrXgmtZLj2ssrYuw')
+      .sign(hdRegPrivateChildKey);
+
+    setRawTransaction(transaction.toString())
+  }
+
   return (
     <div>
       <h1>General Keys</h1>
@@ -130,6 +162,9 @@ function App() {
       <QRCodeSVG value={`bitcoinsv: ${address}`} />
       <h3>Exchange Rate: {renderExchangeRate()}</h3>
       <h3>Wallet Balance: {renderWalletBalance()}</h3>
+
+      <button onClick={doTransaction}>Do Transaction</button>
+      <h3>Raw Transaction: {rawTransaction}</h3>
     </div>
   );
 }
